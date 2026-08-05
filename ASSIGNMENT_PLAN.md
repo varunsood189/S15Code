@@ -52,7 +52,8 @@ Ladder: economy (Groq gpt-oss-120b) → standard (Gemini flash-lite) → frontie
 ### Step 4 — Package
 - [x] README Evidence section complete with reproduce commands
 - [x] No secrets in PR
-- [ ] Open PR
+- [ ] Open PR (branch pushed; `gh` needs auth — open via
+  https://github.com/varunsood189/S15Code/pull/new/assignment/s15-policy-evidence )
 
 ## Push cadence
 
