@@ -120,15 +120,56 @@ the layer is additive.
 
 ## Assignment evidence
 
-Part 1 floor capture (four live runs, Jaeger ID, ledger, limitation) lives in
-[`docs/part1_evidence.md`](docs/part1_evidence.md). Regenerate from proof JSON:
+Session 15 assignment for a **systems / platform operations** workload.
+
+| Part | Doc | What it proves |
+|---|---|---|
+| Plan | [`ASSIGNMENT_PLAN.md`](ASSIGNMENT_PLAN.md) | Step checklist and push cadence |
+| 1 — Floor | [`docs/part1_evidence.md`](docs/part1_evidence.md) | Four live runs, Jaeger ID, ledger, honest limitation |
+| 2 — Policy | [`docs/part2_policy.md`](docs/part2_policy.md) + [`docs/part2_evidence.md`](docs/part2_evidence.md) | Ladder/budget policy; live A/B/C cost/call & cost/resolved; break-even r*; wrong-policy case |
+| 3 — Attack | [`docs/part3_evidence.md`](docs/part3_evidence.md) | Denial-of-wallet + unaffordable refusal with visible `refusal_log` |
+| Tasks | [`proofs/tasks/my_domain.jsonl`](proofs/tasks/my_domain.jsonl) | 15 domain tasks (not the shipped mixed set) |
+
+### Headline live numbers (Part 2)
+
+| Strategy | Cost/call | Resolved | Cost/resolved |
+|---|---:|---:|---:|
+| A always_frontier | $0.001458 | 13/15 | $0.001570 |
+| B always_cheapest | $0.000187 | 14/15 | $0.000240 |
+| C budget_aware | $0.000194 | **15/15** | **$0.000207** |
+
+Break-even r* (B vs A) ≈ **0.288**; B resolution ≈ **0.933** (wide headroom).
+Wrong case: `sys_14_logic_puzzle` — frontier failed, economy/cascade resolved.
+
+### Reproduce from a fresh checkout
+
+```bash
+# terminals: Jaeger, glc_v4 on :8111, s15code on :8113
+export GLC_BASE_URL=http://127.0.0.1:8111
+export S15_OTEL_EXPORTER_ENDPOINT=http://localhost:4318/v1/traces
+
+TASK="In exactly two sentences, explain why a budget must be enforced in code rather than in a prompt."
+uv run python proofs/p2_budget_holds.py --task "$TASK" --budget 0.02 --principal varun/part1 --label part1
+uv run python proofs/p4_trace_export.py --task "$TASK" --budget 0.02 --principal varun/part1 --label part1 --otel-endpoint http://localhost:4318/v1/traces
+uv run python proofs/p7_cross_model_ladder.py --task "$TASK" --principal varun/part1 --label part1
+uv run python proofs/p3_denial_of_wallet.py --task "$TASK" --budget 0.002 --principal varun/part1 --label part1
+uv run python proofs/extract_part1.py --label part1
+
+uv run python proofs/p1_cost_per_task.py --tasks proofs/tasks/my_domain.jsonl \
+  --budget 0.05 --principal varun/s15-domain --label my_domain_live
+uv run python proofs/extract_part2.py --label my_domain_live
+
+uv run python proofs/p3_denial_of_wallet.py \
+  --task "Calculate Raft quorum for 9 nodes and explain in one sentence." \
+  --budget 0.001 --principal varun/s15-domain --label part3
+```
+
+Regenerate markdown:
 
 ```bash
 uv run python proofs/extract_part1.py --label part1
+uv run python proofs/extract_part2.py --label my_domain_live
 ```
-
-Part 2 live measurement: [`docs/part2_evidence.md`](docs/part2_evidence.md) (policy in [`docs/part2_policy.md`](docs/part2_policy.md)).
-Part 3 adversarial budget: [`docs/part3_evidence.md`](docs/part3_evidence.md).
 
 ## Proofs
 

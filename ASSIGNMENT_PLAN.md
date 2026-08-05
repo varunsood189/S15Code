@@ -50,8 +50,8 @@ Ladder: economy (Groq gpt-oss-120b) → standard (Gemini flash-lite) → frontie
 - [x] Commit + push
 
 ### Step 4 — Package
-- [ ] README Evidence section complete with reproduce commands
-- [ ] No secrets in PR
+- [x] README Evidence section complete with reproduce commands
+- [x] No secrets in PR
 - [ ] Open PR
 
 ## Push cadence
