@@ -44,10 +44,10 @@ Ladder: economy (Groq gpt-oss-120b) → standard (Gemini flash-lite) → frontie
 - [x] Commit + push
 
 ### Step 3 — Part 3: attack the budget
-- [ ] Adversarial run against our principal/policy
-- [ ] Spend before control vs refusal after
-- [ ] Refusal visible in telemetry
-- [ ] Commit + push
+- [x] Adversarial run against our principal/policy
+- [x] Spend before control vs refusal after
+- [x] Refusal visible in telemetry
+- [x] Commit + push
 
 ### Step 4 — Package
 - [ ] README Evidence section complete with reproduce commands
