@@ -96,6 +96,10 @@ tiers:
 # Which tier a graph ROLE asks for. Keys are the runtime's own skill/role names
 # (never task content), so a node "declares the tier it needs" by declaring its
 # role. `default` covers every role not listed.
+#
+# Systems/ops assignment policy: retrieval and formatting stay on economy;
+# the answering role still *requests* frontier and lets the budget controller
+# downgrade when the projected call no longer fits (docs/part2_policy.md).
 role_tiers:
   default: standard
   memory_recall: economy
@@ -115,3 +119,4 @@ role_tiers:
   coder_validator: standard
   compose_surface: standard
   answer_with_evidence: frontier
+

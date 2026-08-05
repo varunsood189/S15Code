@@ -4,6 +4,9 @@
 # agent — whatever string the caller attributes spend to). The controller is
 # deterministic code, not a prompt: token elasticity means a model asked nicely
 # to stay under a ceiling will sail straight through it.
+#
+# Session 15 assignment (systems/ops domain): slightly earlier downgrade and a
+# tighter call ceiling than the stock teaching defaults — see docs/part2_policy.md.
 
 # Used when a caller asks for a budgeted run without naming an amount.
 default_budget: 0.05
@@ -15,10 +18,11 @@ reserve_fraction: 0.20
 
 # Spend ratio (spent / total) at or above which a node's requested tier is
 # downgraded one rung at a time down the ladder in tiers.yaml.
-downgrade_at: 0.50
+# Ops domain: walk down earlier so cascades feel budget pressure sooner.
+downgrade_at: 0.45
 
 # Spend ratio at or above which no further call is admitted at any tier.
-refuse_at: 0.90
+refuse_at: 0.88
 
 # A projected call must leave at least this much of the run allowance unspent,
 # as a fraction of the total. Stops the last call from landing exactly on zero.
@@ -32,8 +36,8 @@ chars_per_token: 4
 input_estimate_safety: 1.25
 
 # Hard ceiling on admitted calls per run. Denial-of-wallet defence that does not
-# depend on price estimates being right.
-max_calls_per_run: 60
+# depend on price estimates being right. Tighter for the ops FAQ workload.
+max_calls_per_run: 48
 
 # Hard ceiling on admitted calls attributable to one graph node, so a single
 # retrying node cannot spin.
@@ -41,5 +45,5 @@ max_calls_per_node: 6
 
 # Optional per-principal allowance overrides. A principal named here gets this
 # ceiling regardless of what the caller asked for, whichever is smaller.
-principals: {}
-  # example-tenant/example-project: 0.02
+principals:
+  varun/s15-domain: 0.05
