@@ -83,7 +83,7 @@ tiers:
 
   frontier:
     request:
-      provider: github
+      provider: openrouter
       model: openai/gpt-4.1
       # gpt-4.1 has no thinking channel to switch off, so the dial is left
       # alone here rather than sent and ignored.
