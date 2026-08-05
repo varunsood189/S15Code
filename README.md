@@ -127,8 +127,8 @@ Part 1 floor capture (four live runs, Jaeger ID, ledger, limitation) lives in
 uv run python proofs/extract_part1.py --label part1
 ```
 
-Part 2 (own-domain policy + cost-per-resolved) and Part 3 (adversarial budget)
-evidence land in later commits on this branch — see `ASSIGNMENT_PLAN.md`.
+Part 2 live measurement: [`docs/part2_evidence.md`](docs/part2_evidence.md) (policy in [`docs/part2_policy.md`](docs/part2_policy.md)).
+Part 3 (adversarial budget) lands next — see `ASSIGNMENT_PLAN.md`.
 
 ## Proofs
 

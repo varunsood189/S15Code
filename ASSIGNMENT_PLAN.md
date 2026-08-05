@@ -36,12 +36,12 @@ Ladder: economy (Groq gpt-oss-120b) → standard (Gemini flash-lite) → frontie
 
 ### Step 2 — Part 2: policy + measure
 - [x] Own task file (≥15), not shipped `mixed.jsonl`
-- [ ] Policy edits in `config/tiers.yaml` + `config/budgets.yaml`
-- [ ] Live `p1_cost_per_task.py --tasks proofs/tasks/my_domain.jsonl`
-- [ ] Report cost/call, cost/resolved vs always-frontier
-- [ ] Break-even resolution rate \(r^*\)
-- [ ] One wrong policy choice + cost analysis
-- [ ] Commit + push
+- [x] Policy edits in `config/tiers.yaml` + `config/budgets.yaml`
+- [x] Live `p1_cost_per_task.py --tasks proofs/tasks/my_domain.jsonl`
+- [x] Report cost/call, cost/resolved vs always-frontier
+- [x] Break-even resolution rate r*
+- [x] One wrong policy choice + cost analysis
+- [x] Commit + push
 
 ### Step 3 — Part 3: attack the budget
 - [ ] Adversarial run against our principal/policy
