@@ -118,6 +118,18 @@ a span tree.
 Omit `budget` and the run behaves exactly as it did before economics existed —
 the layer is additive.
 
+## Assignment evidence
+
+Part 1 floor capture (four live runs, Jaeger ID, ledger, limitation) lives in
+[`docs/part1_evidence.md`](docs/part1_evidence.md). Regenerate from proof JSON:
+
+```bash
+uv run python proofs/extract_part1.py --label part1
+```
+
+Part 2 (own-domain policy + cost-per-resolved) and Part 3 (adversarial budget)
+evidence land in later commits on this branch — see `ASSIGNMENT_PLAN.md`.
+
 ## Proofs
 
 One harness, one code path, six proofs. Each takes the **task (or task set, or

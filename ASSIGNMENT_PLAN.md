@@ -29,10 +29,10 @@ Ladder: economy (Groq gpt-oss-120b) → standard (Gemini flash-lite) → frontie
 - [x] Frontier provider decision documented (OpenRouter for gpt-4.1)
 
 ### Step 1 — Part 1: reproduce the floor
-- [ ] Five proofs live: p1, p2, p3, p4, p7
-- [ ] Four runs documented: prompt, tier/model, event trace, Jaeger ID, ledger, answer
-- [ ] One honest limitation
-- [ ] Evidence draft committed + pushed
+- [x] Five proofs live: p1 (prior run1), p2/p3/p4/p7 (`--label part1`)
+- [x] Four runs documented in `docs/part1_evidence.md`
+- [x] One honest limitation (content-off traces + projected vs measured spread)
+- [x] Evidence draft committed + pushed
 
 ### Step 2 — Part 2: policy + measure
 - [x] Own task file (≥15), not shipped `mixed.jsonl`
