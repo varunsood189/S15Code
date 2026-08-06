@@ -121,25 +121,89 @@ the layer is additive.
 ## Assignment evidence
 
 Session 15 assignment for a **systems / platform operations** workload.
+Full write-ups also live under [`docs/`](docs/); the sections below are the
+submission summary. Branch: `assignment/s15-policy-evidence`.
 
-| Part | Doc | What it proves |
-|---|---|---|
-| Plan | [`ASSIGNMENT_PLAN.md`](ASSIGNMENT_PLAN.md) | Step checklist and push cadence |
-| 1 — Floor | [`docs/part1_evidence.md`](docs/part1_evidence.md) | Four live runs, Jaeger ID, ledger, honest limitation |
-| 2 — Policy | [`docs/part2_policy.md`](docs/part2_policy.md) + [`docs/part2_evidence.md`](docs/part2_evidence.md) | Ladder/budget policy; live A/B/C cost/call & cost/resolved; break-even r*; wrong-policy case |
-| 3 — Attack | [`docs/part3_evidence.md`](docs/part3_evidence.md) | Denial-of-wallet + unaffordable refusal with visible `refusal_log` |
-| Tasks | [`proofs/tasks/my_domain.jsonl`](proofs/tasks/my_domain.jsonl) | 15 domain tasks (not the shipped mixed set) |
+| Artifact | Path |
+|---|---|
+| Task file (15) | [`proofs/tasks/my_domain.jsonl`](proofs/tasks/my_domain.jsonl) |
+| Ladder + roles | [`config/tiers.yaml`](config/tiers.yaml) |
+| Budget policy | [`config/budgets.yaml`](config/budgets.yaml) |
+| Part 1 detail | [`docs/part1_evidence.md`](docs/part1_evidence.md) |
+| Part 2 detail | [`docs/part2_evidence.md`](docs/part2_evidence.md) |
+| Part 3 detail | [`docs/part3_evidence.md`](docs/part3_evidence.md) |
 
-### Headline live numbers (Part 2)
+### Part 1 — Reproduce the floor
+
+Suites: S15Code pytest **277 passed**; glc_v4 **448 passed / 8 skipped**.
+Five live proofs: `p1` (mixed), `p2`, `p3`, `p4`, `p7`.
+
+Shared prompt for the four captured runs:
+
+> In exactly two sentences, explain why a budget must be enforced in code rather than in a prompt.
+
+| Run | Tier / model | Event / span trace | Jaeger | Ledger | Final answer |
+|---|---|---|---|---|---|
+| 1 · p2 generous | `frontier` / `openai/gpt-4.1` | admit → call → charge (`run-fc4def9c17e7`) | (see run 2) | spent **$0.000880** | N/A (ledger proof) |
+| 1b · p2 declared $0.02 | requested frontier → **downgraded** `standard` / `gemini-3.1-flash-lite` | same | (see run 2) | spent **$0.000147**; impossible ceiling → **1 refusal, $0** | N/A |
+| 2 · p4 | `standard` / `gemini-3.1-flash-lite` | `run → agent_loop → plan → node → provider_call` | **`8dc106ed11679e05139688a3e4b21b7b`** | span cost **==** ledger **$0.000147** (delta 0) | content off in spans |
+| 3 · p7 | economy groq/`gpt-oss-120b`; standard gemini/`flash-lite`; frontier openrouter/`gpt-4.1` | pin each rung + downgrade under budget | N/A in harness | projected spread **84.1×**; measured **6.60×** | non-empty on every rung |
+| 4 · HTTP agent | role asks frontier; `$0.02` serves **standard** / flash-lite | `run_started` → recall → answer | same hierarchy as p4 | spent **$0.000147**, 1 downgrade | *“Enforcing a budget in code ensures… Relying solely on a prompt is insufficient…”* |
+
+**Honest limitation:** content capture is off by default — Jaeger shows model,
+tokens, cost, and hierarchy, but not the prompt/completion, so a wrong answer
+cannot be diagnosed from the trace alone. Also, list-price ladder spread
+(~84×) is far wider than measured charge spread (~6–8×) on this prompt.
+
+### Part 2 — Policy and measurement
+
+**Workload:** systems/ops FAQ-style tasks (ports, CAP, CIDR, SLO, Raft, latency,
+cost trade-offs) — [`proofs/tasks/my_domain.jsonl`](proofs/tasks/my_domain.jsonl).
+
+**Ladder:** economy `groq/openai/gpt-oss-120b` → standard `gemini/gemini-3.1-flash-lite`
+→ frontier `openrouter/openai/gpt-4.1`. Budget: `downgrade_at=0.45`,
+`refuse_at=0.88`, `max_calls_per_run=48`, principal `varun/s15-domain` @ $0.05
+([`docs/part2_policy.md`](docs/part2_policy.md)).
+
+**Judge:** shipped generic rubric in `config/evals.yaml` (panel separate from the
+answering ladder; overall ≥ 0.75, per-criterion floor 0.5; not self-judged).
+
+Live `p1` (`--label my_domain_live`):
 
 | Strategy | Cost/call | Resolved | Cost/resolved |
 |---|---:|---:|---:|
 | A always_frontier | $0.001458 | 13/15 | $0.001570 |
 | B always_cheapest | $0.000187 | 14/15 | $0.000240 |
-| C budget_aware | $0.000194 | **15/15** | **$0.000207** |
+| C budget_aware (our policy) | $0.000194 | **15/15** | **$0.000207** |
 
-Break-even r* (B vs A) ≈ **0.288**; B resolution ≈ **0.933** (wide headroom).
-Wrong case: `sys_14_logic_puzzle` — frontier failed, economy/cascade resolved.
+**Break-even r\* (B vs A)** from measured spread: **0.288**. B resolution **0.933**
+→ headroom **+0.645** (B stays cheaper per resolved task on this ladder).
+B vs C shows the signature trap vs the cascade: cheaper/call but dearer/resolved
+(r\* ≈ 0.965; B is below it).
+
+**Policy got wrong — `sys_14_logic_puzzle`:** always-frontier **failed** (no usable
+resolution) while economy / budget-aware resolved in **1 call for $0.000184**.
+The price ladder is not a competence ranking on this task. Related: on
+`sys_15_econ_tradeoff`, frontier spent **$0.007638** and still failed; cascade
+escalated economy→standard and resolved for **$0.001377**.
+
+### Part 3 — Attack our budget
+
+**Attack 1 — runaway loop** (`p3`, principal `varun/s15-domain`, ceiling $0.001):
+
+| | Before control (extrapolated) | After control (measured) |
+|---|---:|---:|
+| Spend | ~$0.54 / 10k rounds | **$0.000591** ≤ $0.001 |
+| Calls | unbounded | **11** admitted / **189** refused |
+| Visibility | n/a | refusals are **`BudgetRefused`** graph failures |
+
+Detail log narrative: [`docs/part3_evidence.md`](docs/part3_evidence.md)
+(proof JSON locally at `proofs/out/p3_denial_of_wallet_part3.json`, gitignored).
+
+**Attack 2 — unaffordable tier** (`POST /v1/agent/runs` with `budget=5e-7`):
+status `failed`, spent **$0**, calls **0**, refusals **1**, reason: cheapest
+economy projects ~$0.000437 > remaining — refused **before** any provider call;
+visible in `budget.refusal_log`.
 
 ### Reproduce from a fresh checkout
 
@@ -162,13 +226,6 @@ uv run python proofs/extract_part2.py --label my_domain_live
 uv run python proofs/p3_denial_of_wallet.py \
   --task "Calculate Raft quorum for 9 nodes and explain in one sentence." \
   --budget 0.001 --principal varun/s15-domain --label part3
-```
-
-Regenerate markdown:
-
-```bash
-uv run python proofs/extract_part1.py --label part1
-uv run python proofs/extract_part2.py --label my_domain_live
 ```
 
 ## Proofs
