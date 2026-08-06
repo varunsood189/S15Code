@@ -120,6 +120,8 @@ the layer is additive.
 
 ## Assignment evidence
 
+**Reader-friendly report:** [`docs/ASSIGNMENT_REPORT.md`](docs/ASSIGNMENT_REPORT.md)
+
 Session 15 assignment for a **systems / platform operations** workload.
 Full write-ups also live under [`docs/`](docs/); the sections below are the
 submission summary. Branch: `assignment/s15-policy-evidence`.
